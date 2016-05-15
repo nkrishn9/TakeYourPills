@@ -2,7 +2,7 @@ import sys
 import os
 from twilio.rest import TwilioRestClient
 
-phoneNumber = -1
+phoneNumber = False
 
 def main():
 	os.system('clear')
@@ -11,6 +11,7 @@ def main():
 		os.system('clear')
 		if choice == 1:
 			print("Set phone number")
+			testy = input("test: ")
 		elif choice == 2:
 			print("Add a medication")
 		elif choice == 3:
@@ -19,16 +20,15 @@ def main():
 			print("View all medications")
 		else:
 			print("Start Listening")
+		os.system('clear')
 		choice = printMenu()
 
-
 def printMenu():
-	if phoneNumber == -1:
+	if not phoneNumber:
 		print("Phone Number: NOT SET\n")
 	else:
 		print("Phone Number: " + phoneNumber)
 	print("1) Set phone number\n2) Add a medication\n3) Delete a medication\n4) View all medications\n5) Start Listening\n6) Quit")
-	takeInput = True
 	while True:
 		try:
 			choice = int(input("Pick a menu option: "))
