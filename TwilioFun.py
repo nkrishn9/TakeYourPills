@@ -6,7 +6,6 @@ def main():
 	#Enter your Twilio account information below:
 	ACCOUNT_SID = os.environ["ACCOUNT_SID"]
 	AUTH_TOKEN = os.environ["API_KEY"]
-
 	client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
 
 	client.messages.create(

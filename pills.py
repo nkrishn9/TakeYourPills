@@ -1,8 +1,19 @@
 import sys
 import os
 from twilio.rest import TwilioRestClient
+import sqlite3 as lite
 
-phoneNumber = False
+phoneSet = False
+phoneNumber = 0;
+con = lite.connect('data.db')
+with con:
+	cur = con.cursor()
+	cur.execute("SELECT * FROM sqlite_master WHERE name ='phoneNumber' and type='table'; ")
+	if len(cur.fetchall()) is not 0:
+		phoneSet = True
+		cur.execute("SELECT * FROM phoneNumber")
+		phoneNumber = int(cur.fetchone()[0])
+
 
 def main():
 	os.system('clear')
@@ -11,7 +22,7 @@ def main():
 		os.system('clear')
 		if choice == 1:
 			print("Set phone number")
-			testy = input("test: ")
+			addNumber(input("New number: "))
 		elif choice == 2:
 			print("Add a medication")
 		elif choice == 3:
@@ -24,10 +35,11 @@ def main():
 		choice = printMenu()
 
 def printMenu():
-	if not phoneNumber:
+	global phoneSet, phoneNumber
+	if not phoneSet:
 		print("Phone Number: NOT SET\n")
 	else:
-		print("Phone Number: " + phoneNumber)
+		print("Phone Number: (" + str(phoneNumber)[0:3] + ") " + str(phoneNumber)[3:6] + "-" + str(phoneNumber)[6:] + "\n")
 	print("1) Set phone number\n2) Add a medication\n3) Delete a medication\n4) View all medications\n5) Start Listening\n6) Quit")
 	while True:
 		try:
@@ -35,13 +47,26 @@ def printMenu():
 			if 0 < choice <= 6:
 				return choice
 			else:
-				print("Invalid Input-- try again")
-		except ValueError:
+				print("Enter an option from 1 to 6")
+		except BaseException:
 			print("Invalid Input-- try again")
-		except NameError:
-			print("Invalid Input-- try again")
-		except SyntaxError:
-			print("Invalid Input-- try again")
+
+def addNumber(numToAdd):
+	global phoneSet, phoneNumber
+	while True:
+		try:
+			numToAdd = int(numToAdd)
+			break
+		except BaseException:
+			numToAdd = input("Enter a valid phone number: ")
+	with con:
+		cur = con.cursor()
+		cur.execute("DROP TABLE IF EXISTS phoneNumber")
+		cur.execute("CREATE TABLE phoneNumber(number INT)")
+		cur.execute("INSERT INTO phoneNumber VALUES(" + str(numToAdd) + ")")
+		phoneSet = True
+		cur.execute("SELECT * FROM phoneNumber")
+		phoneNumber = int(cur.fetchone()[0])
 
 
 if __name__ == "__main__":
