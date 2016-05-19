@@ -51,7 +51,7 @@ def main():
 		choice = printMenu()
 
 def printMenu():
-	global phoneSet, phoneNumber
+	global phoneSet, phoneNumber, medicationList
 	if not phoneSet:
 		print("Phone Number: NOT ASSIGNED")
 	else:
@@ -61,7 +61,7 @@ def printMenu():
 	else:
 		print("Current Medications: ")
 		for medication in medicationList:
-			print(medication[0] + " at " + medication[1])
+			print(medication.name + " at " + str(medication.time))
 	print("")
 	print("1) Set phone number\n2) Add a medication\n3) Delete a medication\n4) Start Listening\n5) Quit")
 	while True:
@@ -92,7 +92,38 @@ def addNumber(numToAdd):
 		phoneNumber = int(cur.fetchone()[0])
 
 def addMedication():
-	testy = input('test')
+	medicationName = input("Medication name: ")
+	#Error Check this later
+	medicationName = "'" + medicationName + "'"
+	time = input("When will you be taking " + medicationName + "(HH:MM AM/PM)? ")
+	hours = time[0:2]
+	minutes = time[3:5]
+	beforeNoon = False
+	if time[6:].upper() == "AM":
+		beforeNoon = True
+	aggregate = timeToInt(hours, minutes, beforeNoon)
+	temp = Medication(medicationName, aggregate)
+	medicationList.append(temp)
+	medicationName = "'" + medicationName + "'"
+	tup = (medicationName, str(aggregate))
+	cur.execute("INSERT INTO medications VALUES(?, ?)", (tup))
+
+def timeToInt(hours, minutes, beforeNoon):
+	hours = int(hours)
+	minutes = int(minutes)
+	if beforeNoon:
+		return (hours * 60 + minutes)
+	else:
+		return (12 * 60 + (hours % 12) * 60 + minutes)
+
+def intToTime(aggregate):
+	minutes = aggregate % 60
+	hours = aggregate / 60
+	beforeNoon = True
+	if hours > 12:
+		hours = hours % 12
+		beforeNoon = False
+	return [hours, minutes, beforeNoon]
 
 if __name__ == "__main__":
 	main()
