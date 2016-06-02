@@ -9,6 +9,7 @@ class Medication:
 	def __init__(self, name, time):
 		self.name = name
 		self.time = time
+
 medicationList = []
 phoneSet = False
 phoneNumber = 0;
@@ -30,8 +31,7 @@ with con:
 		rows = cur.fetchall()
 		for row in rows:
 			temp = Medication(row[0], int(row[1]))
-			medicationList.append(temp)
-			
+			medicationList.append(temp)		
 
 def main():
 	os.system('clear')
@@ -105,7 +105,6 @@ def addMedication():
 	while True:
 		try:
 			medicationName = input("Medication name: ")
-			#Error Check this later
 			medicationName = "'" + medicationName + "'"
 			time = input("When will you be taking " + medicationName + "(HH:MM AM/PM)? ")
 			colon = time.index(":")
