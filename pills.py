@@ -61,8 +61,7 @@ def printMenu():
 		print("Current Medications: NONE ASSIGNED")
 	else:
 		print("Current Medications: ")
-		for medication in medicationList:
-			print(medication.name + " at " + str(intToTime(medication.time)))
+		printMed()
 	print("")
 	print("1) Set phone number\n2) Add a medication\n3) Delete a medication\n4) Start Listening\n5) Quit")
 	while True:
@@ -74,6 +73,15 @@ def printMenu():
 				print("Enter an option from 1 to 5")
 		except BaseException:
 			print("Invalid Input-- try again")
+
+def printMed():
+	global medicationList
+	for medication in medicationList:
+		tup = intToTime(medication.time)
+		third = "PM"
+		if (tup[2] == True):
+			third = "AM"
+		print(medication.name.replace("'", "") + " at " + str(tup[0]) + ":" + str(tup[1]).zfill(2) + " " + third)
 
 def addNumber(numToAdd):
 	global phoneSet, phoneNumber
@@ -94,22 +102,28 @@ def addNumber(numToAdd):
 		phoneNumber = int(cur.fetchone()[0])
 
 def addMedication():
-	medicationName = input("Medication name: ")
-	#Error Check this later
-	medicationName = "'" + medicationName + "'"
-	time = input("When will you be taking " + medicationName + "(HH:MM AM/PM)? ")
-	hours = time[0:2]
-	minutes = time[3:5]
-	beforeNoon = False
-	if time[6:].upper() == "AM":
-		beforeNoon = True
-	aggregate = timeToInt(hours, minutes, beforeNoon)
-	temp = Medication(medicationName, aggregate)
-	medicationList.append(temp)
-	medicationName = "'" + medicationName + "'"
-	tup = (medicationName, str(aggregate))
-	cur.execute("INSERT INTO medications VALUES(?, ?)", (tup))
-	con.commit()
+	while True:
+		try:
+			medicationName = input("Medication name: ")
+			#Error Check this later
+			medicationName = "'" + medicationName + "'"
+			time = input("When will you be taking " + medicationName + "(HH:MM AM/PM)? ")
+			colon = time.index(":")
+			hours = time[0:colon]
+			minutes = time[colon+1:colon+3]
+			beforeNoon = False
+			if time[colon + 4:].upper() == "AM":
+				beforeNoon = True
+			aggregate = timeToInt(hours, minutes, beforeNoon)
+			temp = Medication(medicationName, aggregate)
+			medicationList.append(temp)
+			medicationName = "'" + medicationName + "'"
+			tup = (medicationName, str(aggregate))
+			cur.execute("INSERT INTO medications VALUES(?, ?)", (tup))
+			con.commit()
+			break
+		except BaseException:
+			print("Invalid Input, please try again...")
 
 
 def timeToInt(hours, minutes, beforeNoon):
