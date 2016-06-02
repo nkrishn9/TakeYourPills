@@ -31,6 +31,7 @@ with con:
 		for row in rows:
 			temp = Medication(row[0], int(row[1]))
 			medicationList.append(temp)
+			
 
 def main():
 	os.system('clear')
@@ -61,7 +62,7 @@ def printMenu():
 	else:
 		print("Current Medications: ")
 		for medication in medicationList:
-			print(medication.name + " at " + str(medication.time))
+			print(medication.name + " at " + str(intToTime(medication.time)))
 	print("")
 	print("1) Set phone number\n2) Add a medication\n3) Delete a medication\n4) Start Listening\n5) Quit")
 	while True:
@@ -87,6 +88,7 @@ def addNumber(numToAdd):
 		cur.execute("DROP TABLE IF EXISTS phoneNumber")
 		cur.execute("CREATE TABLE phoneNumber(number INT)")
 		cur.execute("INSERT INTO phoneNumber VALUES(" + str(numToAdd) + ")")
+		con.commit()
 		phoneSet = True
 		cur.execute("SELECT * FROM phoneNumber")
 		phoneNumber = int(cur.fetchone()[0])
@@ -107,6 +109,8 @@ def addMedication():
 	medicationName = "'" + medicationName + "'"
 	tup = (medicationName, str(aggregate))
 	cur.execute("INSERT INTO medications VALUES(?, ?)", (tup))
+	con.commit()
+
 
 def timeToInt(hours, minutes, beforeNoon):
 	hours = int(hours)
@@ -118,7 +122,7 @@ def timeToInt(hours, minutes, beforeNoon):
 
 def intToTime(aggregate):
 	minutes = aggregate % 60
-	hours = aggregate / 60
+	hours = int(aggregate / 60)
 	beforeNoon = True
 	if hours > 12:
 		hours = hours % 12
